@@ -12,7 +12,7 @@ defmodule Electral do
       :world
 
   """
-  def hello, do: "hello"
+  def hello(), do: "hello"
   def hello(""), do: "hello"
   def hello(name), do: "who is " <> name <> "?"
 end
