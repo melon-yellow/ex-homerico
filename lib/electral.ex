@@ -14,5 +14,7 @@ defmodule Electral do
   """
   def hello(), do: "hello"
   def hello(""), do: "hello"
-  def hello(name) when is_binary(name), do: "who is " <> name <> "?"
+  def hello(name) when is_binary(name) do
+    "who is " <> name <> "?"
+  end
 end
