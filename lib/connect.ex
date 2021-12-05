@@ -66,6 +66,20 @@ defmodule Homerico.Connect do
   @doc """
   Homerico Local Login.
   """
+  def login!(
+    %Homerico.Connect.Config{} = config,
+    user,
+    password
+  ) when is_binary(user) and is_binary(password) do
+    case login(config, user, password) do
+      {:error, reason} -> raise reason
+      {:ok, config} -> config
+    end
+  end
+
+  @doc """
+  Homerico Local Login.
+  """
   def login(
     %Homerico.Connect.Config{} = config,
     user,
