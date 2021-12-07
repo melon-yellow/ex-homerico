@@ -1,7 +1,15 @@
 
-defmodule Homerico.Reports do
+import Unsafe.Handler
 
-  defp httptoken!(
+defmodule Homerico.Reports do
+  use Unsafe.Generator,
+    handler: :bang!
+
+  @unsafe [
+    { :relatorio_lista, 4 }
+  ]
+
+  defp url_token!(
     numencypt,
     %Homerico.Connect.Config{} = config
   ) when is_binary(numencypt) do
@@ -11,16 +19,22 @@ defmodule Homerico.Reports do
     config.token
   end
 
-  def relatorioLista(
+  def relatorio_lista(
     %Homerico.Connect.Config{} = config,
     dataInicial,
     dataFinal,
     idProcesso
-  ) when is_binary(dataInicial) and is_binary(dataFinal) and is_binary(idProcesso) do
+  ) when
+    is_binary(dataInicial) and
+    is_binary(dataFinal) and
+    is_binary(idProcesso) and
+    is_binary(config.token)
+  do
     try do
       # Check Authentication
-      unless is_binary(config.token) throw "sem autenticacao"
-      unless Enum.any?(config.menus, &("d1" == &1)) throw "sem acesso ao menu"
+      unless Enum.any?(config.menus, &("d1" == &1)) do
+        throw "sem acesso ao menu"
+      end
 
       # Set Resquest JSON
       json = %{
@@ -32,7 +46,7 @@ defmodule Homerico.Reports do
 
       # Set Request Token
       query = Homerico.Connect.date!
-        |> httptoken!(config)
+        |> url_token!(config)
 
       # Set Request URL
       url = "reports/relatoriolistas?#{query}"

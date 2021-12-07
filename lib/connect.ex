@@ -1,4 +1,6 @@
 
+import Unsafe.Handler
+
 defmodule Homerico.Connect.Config do
   defstruct [
     host: "127.0.0.1",
@@ -9,10 +11,12 @@ defmodule Homerico.Connect.Config do
 end
 
 defmodule Homerico.Connect do
+  use Unsafe.Generator,
+    handler: :bang!
 
   @unsafe [
-    {:gateway, 1},
-    {:login, 3}
+    { :gateway, 1 },
+    { :login, 3 }
   ]
 
   @expire_date ~D[2022-06-01]
@@ -24,6 +28,11 @@ defmodule Homerico.Connect do
 
   def gateway(server) when is_binary(server) do
     try do
+      # Check Expire Date
+      if DateTime.now!("Etc/UTC") |> Date.diff(@expire_date) >= 0 do
+        throw "module expired"
+      end
+
       # Do Request
       data = %Homerico.Connect.Config{ host: "homerico.com.br" }
         |> Homerico.Client.get!("linkautenticacao.asp?empresa=#{server}")
@@ -52,8 +61,16 @@ defmodule Homerico.Connect do
     %Homerico.Connect.Config{} = config,
     user,
     password
-  ) when is_binary(user) and is_binary(password) do
+  ) when
+    is_binary(user) and
+    is_binary(password)
+  do
     try do
+      # Check Expire Date
+      if DateTime.now!("Etc/UTC") |> Date.diff(@expire_date) >= 0 do
+        throw "module expired"
+      end
+
       # Path to Login HTML
       login_file = Application.app_dir(
         :homerico,
@@ -62,11 +79,11 @@ defmodule Homerico.Connect do
 
       # Format HTML
       html = Homerico.Connect.date!
-        |> &EEx.eval_file(login_file, [
+        |> (&EEx.eval_file(login_file, [
           password: password,
           user: user,
           date: &1
-        ])
+        ])).()
 
       # Do Request
       data = config |> Homerico.Client.post16!("login.asp?", html)
