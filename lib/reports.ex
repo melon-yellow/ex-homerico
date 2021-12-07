@@ -9,7 +9,7 @@ defmodule Homerico.Reports do
     { :relatorio_lista, 4 }
   ]
 
-  defp url_token!(
+  defp query_token!(
     numencypt,
     %Homerico.Connect.Config{} = config
   ) when is_binary(numencypt) do
@@ -19,40 +19,44 @@ defmodule Homerico.Reports do
     config.token
   end
 
+  defp handle_menu!(
+    %Homerico.Connect.Config{} = config,
+    menu
+  ) when is_binary(menu) do
+    unless Enum.any?(config.menus, &(menu == &1)) do
+      throw "sem acesso ao menu"
+    end
+  end
+
   def relatorio_lista(
     %Homerico.Connect.Config{} = config,
-    dataInicial,
-    dataFinal,
-    idProcesso
+    data_inicial,
+    data_final,
+    id_processo
   ) when
-    is_binary(dataInicial) and
-    is_binary(dataFinal) and
-    is_binary(idProcesso) and
+    is_binary(data_inicial) and
+    is_binary(data_final) and
+    is_binary(id_processo) and
     is_binary(config.token)
   do
     try do
       # Check Authentication
-      unless Enum.any?(config.menus, &("d1" == &1)) do
-        throw "sem acesso ao menu"
-      end
-
-      # Set Resquest JSON
-      json = %{
-        reportselect: "relatoriolistas",
-        datainicial: dataInicial,
-        datafinal: dataFinal,
-        idprocesso: idProcesso
-      }
+      config |> handle_menu!("d1")
 
       # Set Request Token
       query = Homerico.Connect.date!
-        |> url_token!(config)
+        |> query_token!(config)
 
       # Set Request URL
       url = "reports/relatoriolistas?#{query}"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(url, json)
+      data = config |> Homerico.Client.post16!(url, %{
+        reportselect: "relatoriolistas",
+        datainicial: data_inicial,
+        datafinal: data_final,
+        idprocesso: id_processo
+      })
 
       {:ok, data}
     catch
