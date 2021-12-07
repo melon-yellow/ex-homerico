@@ -1,71 +1,32 @@
 
-import Poison
-import HTTPoison
-
 defmodule Homerico.Connect.Config do
-  @moduledoc """
-  Documentation for `Homerico.Connect.Config`.
-  """
   defstruct [
     host: "127.0.0.1",
-    port: 8080,
+    port: 80,
     token: "",
     menus: []
   ]
-
-  @doc """
-  Homerico Config get Token-Args.
-  """
-  def tokenargs!(
-    %Homerico.Connect.Config{} = config,
-    numencypt
-  ) when is_binary(numencypt) do
-    "autenticacao=" <>
-    config.token <>
-    "&numencypt=" <>
-    numencypt
-  end
 end
 
 defmodule Homerico.Connect do
-  @moduledoc """
-  Documentation for `Homerico.Connect`.
-  """
+
+  @unsafe [
+    {:gateway, 1},
+    {:login, 3}
+  ]
 
   @expire_date ~D[2022-06-01]
 
-  @doc """
-  Formated Date.
-  """
   def date!() do
     now = DateTime.utc_now
     "#{now.year}-#{now.month}-#{now.day}"
   end
 
-  @doc """
-  Homerico W3 Handshake Verification.
-  """
-  def gateway!(server) when is_binary(server) do
-    case gateway(server) do
-      {:error, reason} -> raise reason
-      {:ok, config} -> config
-    end
-  end
-
-  @doc """
-  Homerico W3 Handshake Verification.
-  """
   def gateway(server) when is_binary(server) do
     try do
-      # Request URL
-      url = "http://homerico.com.br/linkautenticacao.asp?empresa=#{server}"
-
       # Do Request
-      data = case HTTPoison.get(url) do
-        {:ok, %{status_code: 200, body: body}} -> Poison.decode!(body)
-        {:ok, %{status_code: 404}} -> throw "could not reach the link"
-        {:error, %{reason: reason}} -> throw reason
-      end
+      data = %Homerico.Connect.Config{ host: "homerico.com.br" }
+        |> Homerico.Client.get!("linkautenticacao.asp?empresa=#{server}")
 
       # Check Response
       unless Map.has_key?(data, "ip") and is_binary(data["ip"]) do
@@ -87,33 +48,13 @@ defmodule Homerico.Connect do
     end
   end
 
-  @doc """
-  Homerico Local Login.
-  """
-  def login!(
-    %Homerico.Connect.Config{} = config,
-    user,
-    password
-  ) when is_binary(user) and is_binary(password) do
-    case login(config, user, password) do
-      {:error, reason} -> raise reason
-      {:ok, config} -> config
-    end
-  end
-
-  @doc """
-  Homerico Local Login.
-  """
   def login(
     %Homerico.Connect.Config{} = config,
     user,
     password
   ) when is_binary(user) and is_binary(password) do
     try do
-      # Request URL
-      url = "http://#{config.host}:#{config.port}/login.asp?"
-
-      # Helpers for HTML
+      # Path to Login HTML
       login_file = Application.app_dir(
         :homerico,
         "static/login.html"
@@ -128,7 +69,7 @@ defmodule Homerico.Connect do
         ])
 
       # Do Request
-      data = Homerico.Get.post16!(url, html)
+      data = config |> Homerico.Client.post16!("login.asp?", html)
 
       # Check Response
       unless Map.has_key?(data, "status") and is_binary(data["status"]) do
