@@ -3,12 +3,28 @@ import Poison
 import HTTPoison
 
 defmodule Homerico.Connect.Config do
+  @moduledoc """
+  Documentation for `Homerico.Connect.Config`.
+  """
   defstruct [
     host: "127.0.0.1",
     port: 8080,
     token: "",
     menus: []
   ]
+
+  @doc """
+  Homerico Config get Token-Args.
+  """
+  def tokenargs!(
+    %Homerico.Connect.Config{} = config,
+    numencypt
+  ) when is_binary(numencypt) do
+    "autenticacao=" <>
+    config.token <>
+    "&numencypt=" <>
+    numencypt
+  end
 end
 
 defmodule Homerico.Connect do
@@ -17,6 +33,14 @@ defmodule Homerico.Connect do
   """
 
   @expire_date ~D[2022-06-01]
+
+  @doc """
+  Formated Date.
+  """
+  def date!() do
+    now = DateTime.utc_now
+    "#{now.year}-#{now.month}-#{now.day}"
+  end
 
   @doc """
   Homerico W3 Handshake Verification.
@@ -90,25 +114,21 @@ defmodule Homerico.Connect do
       url = "http://#{config.host}:#{config.port}/login.asp?"
 
       # Helpers for HTML
-      now = DateTime.utc_now
       login_file = Application.app_dir(
         :homerico,
         "static/login.html"
       )
 
       # Format HTML
-      html = EEx.eval_file(login_file, [
-        user: user,
-        password: password,
-        date: "#{now.year}-#{now.month}-#{now.day}"
-      ])
+      html = Homerico.Connect.date!
+        |> &EEx.eval_file(login_file, [
+          password: password,
+          user: user,
+          date: &1
+        ])
 
       # Do Request
-      data = case HTTPoison.post(url, Base.encode16(html)) do
-        {:ok, %{status_code: 200, body: body}} -> Poison.decode!(body)
-        {:ok, %{status_code: 404}} -> throw "could not reach the link"
-        {:error, %{reason: reason}} -> throw reason
-      end
+      data = Homerico.Get.post16!(url, html)
 
       # Check Response
       unless Map.has_key?(data, "status") and is_binary(data["status"]) do
