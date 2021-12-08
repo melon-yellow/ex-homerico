@@ -41,18 +41,6 @@ defmodule Homerico.Client do
     stream
   ) when
     is_binary(url) and
-    is_map(stream)
-  do
-    Poison.encode!(stream)
-      |> (&post16(config, url, &1)).()
-  end
-
-  def post16(
-    %Homerico.Connect.Config{} = config,
-    url,
-    stream
-  ) when
-    is_binary(url) and
     is_binary(stream)
   do
     try do
@@ -67,6 +55,18 @@ defmodule Homerico.Client do
     catch
       reason -> {:error, reason}
     end
+  end
+
+  def post16(
+    %Homerico.Connect.Config{} = config,
+    url,
+    stream
+  ) when
+    is_binary(url) and
+    is_map(stream)
+  do
+    Poison.encode!(stream)
+      |> (&post16(config, url, &1)).()
   end
 
 end
