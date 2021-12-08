@@ -44,23 +44,24 @@ defmodule Homerico.Reports do
       config |> handle_menu!("d1")
 
       # Set Request Token
-      query = Homerico.Connect.date!
+      query = Homerico.date_format!
         |> query_token!(config)
 
-      # Set Request URL
-      url = "reports/relatoriolistas?#{query}"
-
       # Do Request
-      data = config |> Homerico.Client.post16!(url, %{
-        reportselect: "relatoriolistas",
-        datainicial: data_inicial,
-        datafinal: data_final,
-        idprocesso: id_processo
-      })
+      data = config |> Homerico.Client.post16!(
+        "reports/relatoriolistas?#{query}",
+        %{
+          reportselect: "relatoriolistas",
+          datainicial: data_inicial,
+          datafinal: data_final,
+          idprocesso: id_processo
+        }
+      )
 
       {:ok, data}
     catch
       reason -> {:error, reason}
     end
   end
+
 end

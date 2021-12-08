@@ -19,19 +19,9 @@ defmodule Homerico.Connect do
     { :login, 3 }
   ]
 
-  @expire_date ~D[2022-06-01]
-
-  def date!() do
-    now = DateTime.utc_now
-    "#{now.year}-#{now.month}-#{now.day}"
-  end
-
   def gateway(server) when is_binary(server) do
     try do
-      # Check Expire Date
-      if DateTime.now!("Etc/UTC") |> Date.diff(@expire_date) >= 0 do
-        throw "module expired"
-      end
+      Homerico.check_expire_date!
 
       # Do Request
       data = %Homerico.Connect.Config{ host: "homerico.com.br" }
@@ -66,10 +56,7 @@ defmodule Homerico.Connect do
     is_binary(password)
   do
     try do
-      # Check Expire Date
-      if DateTime.now!("Etc/UTC") |> Date.diff(@expire_date) >= 0 do
-        throw "module expired"
-      end
+      Homerico.check_expire_date!
 
       # Path to Login HTML
       login_file = Application.app_dir(
@@ -78,12 +65,11 @@ defmodule Homerico.Connect do
       )
 
       # Format HTML
-      html = Homerico.Connect.date!
-        |> (&EEx.eval_file(login_file, [
-          password: password,
-          user: user,
-          date: &1
-        ])).()
+      html = EEx.eval_file(login_file, [
+        user: user,
+        password: password,
+        date: Homerico.date_format!
+      ])
 
       # Do Request
       data = config |> Homerico.Client.post16!("login.asp?", html)
@@ -103,7 +89,7 @@ defmodule Homerico.Connect do
       end
 
       # Set Parameters
-      config = Map.merge(config, %{
+      Map.merge(config, %{
         menus: String.split(data["menu"], ","),
         token: data["autenticacao"]
       })
@@ -113,4 +99,5 @@ defmodule Homerico.Connect do
       reason -> {:error, reason}
     end
   end
+
 end

@@ -14,15 +14,20 @@ defmodule Homerico.Client do
   defp handle_http!({:ok, %{status_code: 404}}), do: throw "(404) could not reach the link"
   defp handle_http!({:error, %{reason: reason}}), do: throw reason
 
+  defp base_url!(
+    %Homerico.Connect.Config{} = config
+  ), do: "http://#{config.host}:#{config.port}/"
+
   def get(
     %Homerico.Connect.Config{} = config,
     url
   ) when is_binary(url) do
     try do
-      prefix = "http://#{config.host}:#{config.port}/"
+      Homerico.check_expire_date!
 
-      data = HTTPoison.get(prefix <> url)
-        |> handle_http!
+      data = HTTPoison.get(
+        config |> base_url! <> url
+      ) |> handle_http!
 
       {:ok, data}
     catch
@@ -51,15 +56,17 @@ defmodule Homerico.Client do
     is_binary(stream)
   do
     try do
-      prefix = "http://#{config.host}:#{config.port}/"
+      Homerico.check_expire_date!
 
-      data = Base.encode16(stream)
-        |> (&HTTPoison.post(prefix <> url, &1)).()
-        |> handle_http!
+      data = HTTPoison.post(
+        config |> base_url! <> url,
+        stream |> Base.encode16
+      ) |> handle_http!
 
       {:ok, data}
     catch
       reason -> {:error, reason}
     end
   end
+
 end
