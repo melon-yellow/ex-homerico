@@ -6,8 +6,8 @@ defmodule Homerico.Client do
     handler: :bang!
 
   @unsafe [
-    { :get, 2 },
-    { :post16, 3 }
+    get: 2,
+    post16: 3
   ]
 
   defp handle_http!({:ok, %{status_code: 200, body: body}}), do: Poison.decode!(body)
@@ -26,7 +26,7 @@ defmodule Homerico.Client do
       Homerico.check_expire_date!
 
       data = HTTPoison.get(
-        config |> base_url! <> url
+        (config |> base_url!) <> url
       ) |> handle_http!
 
       {:ok, data}
@@ -47,8 +47,8 @@ defmodule Homerico.Client do
       Homerico.check_expire_date!
 
       data = HTTPoison.post(
-        config |> base_url! <> url,
-        stream |> Base.encode16
+        (config |> base_url!) <> url,
+        (stream |> Base.encode16)
       ) |> handle_http!
 
       {:ok, data}

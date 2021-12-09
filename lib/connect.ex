@@ -15,8 +15,8 @@ defmodule Homerico.Connect do
     handler: :bang!
 
   @unsafe [
-    { :gateway, 1 },
-    { :login, 3 }
+    gateway: 1,
+    login: 3
   ]
 
   def gateway(server) when is_binary(server) do
