@@ -20,7 +20,7 @@ defmodule Homerico.Reports do
     menu
   ) when is_binary(menu) do
     unless Enum.any?(config.menus, &(menu == &1)) do
-      throw "sem acesso ao menu"
+      throw "no access to menu '#{menu}'"
     end
   end
 
