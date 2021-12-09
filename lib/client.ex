@@ -65,8 +65,9 @@ defmodule Homerico.Client do
     is_binary(url) and
     is_map(stream)
   do
-    Poison.encode!(stream)
-      |> (&post16(config, url, &1)).()
+    config |> post16(url,
+      stream |> Poison.encode!
+    )
   end
 
 end
