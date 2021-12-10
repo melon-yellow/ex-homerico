@@ -61,7 +61,7 @@ defmodule Homerico.Connect do
       # Path to Login HTML
       login_file = Application.app_dir(
         :homerico,
-        "static/login.html"
+        "templates/login.html.heex"
       )
 
       # Format HTML
