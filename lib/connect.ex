@@ -58,18 +58,18 @@ defmodule Homerico.Connect do
     try do
       Homerico.check_expire_date!
 
-      # Path to Login HTML
-      login_file = Application.app_dir(
-        :homerico,
-        "priv/connect/login.heex"
-      )
-
-      # Format HTML
-      html = EEx.eval_file(login_file, [
+      # Params to Login HTML
+      eex_params = [
         user: user,
         password: password,
         date: Homerico.date_format!
-      ])
+      ]
+
+      # Format HTML
+      html = :homerico
+        |> Application.app_dir("priv/connect/login.heex")
+        |> EEx.eval_file(eex_params)
+        |> String.replace(~r/\s/, "")
 
       # Do Request
       data = config |> Homerico.Client.post16!("login.asp?", html)
