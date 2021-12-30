@@ -10,9 +10,16 @@ defmodule Homerico.Client do
     post16: 3
   ]
 
-  defp handle_http!({:ok, %{status_code: 200, body: body}}), do: Poison.decode!(body)
-  defp handle_http!({:ok, %{status_code: 404}}), do: throw "(404) could not reach the link"
-  defp handle_http!({:error, %{reason: reason}}), do: throw reason
+  defp handle_data!(body) do
+    try do Poison.decode!(body)
+    rescue _ -> body
+    catch _ -> body
+    end
+  end
+
+  defp handle_http!({:ok, %{status_code: 200, body: body}}) do handle_data!(body) end
+  defp handle_http!({:ok, %{status_code: 404}}) do throw "(404) could not reach the link" end
+  defp handle_http!({:error, %{reason: reason}}) do throw reason end
 
   defp base_url!(
     %Homerico.Connect.Config{} = config
