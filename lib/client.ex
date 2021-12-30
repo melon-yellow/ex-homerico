@@ -51,11 +51,6 @@ defmodule Homerico.Client do
         (stream |> Base.encode16)
       ) |> handle_http!
 
-      IO.inspect (config |> base_url!) <> url
-      IO.inspect stream
-      IO.inspect (stream |> Base.encode16)
-      IO.inspect data
-
       {:ok, data}
     catch
       reason -> {:error, reason}

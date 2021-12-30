@@ -89,12 +89,12 @@ defmodule Homerico.Connect do
       end
 
       # Set Parameters
-      Map.merge(config, %{
+      upstr = Map.merge(config, %{
         menus: String.split(data["menu"], ","),
         token: data["autenticacao"]
       })
 
-      {:ok, config}
+      {:ok, upstr}
     catch
       reason -> {:error, reason}
     end
