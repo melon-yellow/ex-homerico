@@ -52,7 +52,7 @@ defmodule Homerico.Connect do
     date: Homerico.date_format!
   ]
 
-  defp set_request!(params), do: :homerico
+  defp set_request_html!(params), do: :homerico
     |> Application.app_dir("priv/connect/login.heex")
     |> EEx.eval_file(params)
     |> String.replace(~r/\s/, "")
@@ -73,7 +73,7 @@ defmodule Homerico.Connect do
       # Get Login Token
       hydrated = {user, password}
         |> set_params!
-        |> set_request!
+        |> set_request_html!
         |> get_token!(config)
         |> extract_token!
         |> set_config!(config)
