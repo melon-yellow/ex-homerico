@@ -1,4 +1,3 @@
-
 import Unsafe.Handler
 
 defmodule Homerico.Reports do
@@ -15,28 +14,13 @@ defmodule Homerico.Reports do
     relatorio_interrupcoes: 3
   ]
 
-  defp check_menu!(
-    %Homerico.Connect.Config{} = config,
-    menu
-  ) when is_binary(menu) do
-    unless Enum.any?(config.menus, &(menu == &1)) do
-      throw "no access to menu '#{menu}'"
-    end
-  end
+  defp check_menu!(%Homerico.Connect.Config{} = config, menu)
+    when is_binary(menu) and (menu in config.menus), do: true
+  defp check_menu!(%Homerico.Connect.Config{} = config, menu)
+    when is_binary(menu), do: throw "no access to menu '#{menu}'"
 
-  defp http_query!(
-    %Homerico.Connect.Config{} = config
-  ), do: config |> http_query!(Homerico.date_format!)
-
-  defp http_query!(
-    %Homerico.Connect.Config{} = config,
-    numencypt
-  ) when is_binary(numencypt) do
-    "autenticacao=" <>
-    config.token <>
-    "&numencypt=" <>
-    numencypt
-  end
+  defp http_query!(%Homerico.Connect.Config{} = config, date \\ Homerico.date_format!)
+    when is_binary(date), do: "autenticacao=#{config.token}&numencypt=#{date}"
 
   def relatorio_lista(
     %Homerico.Connect.Config{} = config,
@@ -49,15 +33,11 @@ defmodule Homerico.Reports do
     is_binary(data_final)
   do
     try do
-      # Verify Access
-      config |> check_menu!("d1")
-
-      # Set Request Query
-      query = config |> http_query!
+      check_menu! config, "d1"
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatoriolistas?#{query}",
+        "reports/relatoriolistas?#{http_query! config}",
         %{
           reportselect: "relatoriolistas",
           idprocesso: id_processo,
@@ -67,8 +47,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    catch
-      reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
@@ -81,15 +60,11 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      # Verify Access
-      config |> check_menu!("d3")
-
-      # Set Request Query
-      query = config |> http_query!("[numencypt]")
+      check_menu! config, "d3"
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatoriogerencial?#{query}",
+        "reports/relatoriogerencial?#{http_query! config, '[numencypt]'}",
         %{
           registro: registro,
           data: data
@@ -97,8 +72,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    catch
-      reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
@@ -111,15 +85,11 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      # Verify Access
-      config |> check_menu!("d3")
-
-      # Set Request Query
-      query = config |> http_query!
+      check_menu! config, "d3"
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatoriogerencial?#{query}",
+        "reports/relatoriogerencial?#{http_query! config}",
         %{
           idreport: id_report,
           data: data
@@ -127,8 +97,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    catch
-      reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
@@ -143,15 +112,11 @@ defmodule Homerico.Reports do
     is_binary(data_final)
   do
     try do
-      # Verify Access
-      config |> check_menu!("d1")
-
-      # Set Request Query
-      query = config |> http_query!
+      check_menu! config, "d1"
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatorioboletim?#{query}",
+        "reports/relatorioboletim?#{http_query! config}",
         %{
           reportselect: "relatorioboletim",
           idreport: id_report,
@@ -161,8 +126,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    catch
-      reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
@@ -175,15 +139,11 @@ defmodule Homerico.Reports do
     is_binary(data_final)
   do
     try do
-      # Verify Access
-      config |> check_menu!("pro09")
-
-      # Set Request Query
-      query = config |> http_query!
+      check_menu! config, "pro09"
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/producaolistas?#{query}",
+        "reports/producaolistas?#{http_query! config}",
         %{
           controle: controle,
           data: data_final
@@ -191,8 +151,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    catch
-      reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
@@ -205,15 +164,11 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      # Verify Access
-      config |> check_menu!("pro4")
-
-      # Set Request Query
-      query = config |> http_query!
+      check_menu! config, "pro4"
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/ov?#{query}",
+        "reports/ov?#{http_query! config}",
         %{
           idprocessogrupo: id_processo_grupo,
           data: data
@@ -221,8 +176,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    catch
-      reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
@@ -235,15 +189,11 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      # Verify Access
-      config |> check_menu!("pro2")
-
-      # Set Request Query
-      query = config |> http_query!
+      check_menu! config, "pro2"
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/interrupcoes?#{query}",
+        "reports/interrupcoes?#{http_query! config}",
         %{
           idprocesso: id_processo,
           data: data,
@@ -251,8 +201,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    catch
-      reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 

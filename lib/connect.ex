@@ -1,4 +1,3 @@
-
 import Unsafe.Handler
 
 defmodule Homerico.Connect.Config do
@@ -19,84 +18,71 @@ defmodule Homerico.Connect do
     login: 3
   ]
 
+  defp set_config!(origin) when is_map(origin), do: %Homerico.Connect.Config{origin}
+  defp set_config!(origin, base) when is_map(origin) and is_map(base), do:
+    set_config! Map.merge(base, origin)
+
+  defp get_gateway!(server), do:
+    %Homerico.Connect.Config{host: "homerico.com.br"}
+      |> Homerico.Client.get!("linkautenticacao.asp?empresa=#{server}")
+
+  defp extract_gateway!(%{"ip" => host, "porta" => port})
+    when is_binary(host) and is_binary(port), do:
+      %{host: host, port: String.to_integer port}
+  defp extract_gateway!(_), do: throw "invalid response from server"
+
   def gateway(server) when is_binary(server) do
     try do
-      Homerico.check_expire_date!
+      Homerico.check_expired!
 
-      # Do Request
-      data = %Homerico.Connect.Config{ host: "homerico.com.br" }
-        |> Homerico.Client.get!("linkautenticacao.asp?empresa=#{server}")
-
-      # Check Response
-      unless Map.has_key?(data, "ip") and is_binary(data["ip"]) do
-        throw "response key 'ip' not valid"
-      end
-      unless Map.has_key?(data, "porta") and is_binary(data["porta"]) do
-        throw "response key 'porta' not valid"
-      end
-
-      # Set Parameters
-      config = %Homerico.Connect.Config{
-        port: String.to_integer(data["porta"]),
-        host: data["ip"]
-      }
+      # Get Partial Config
+      config = server
+        |> get_gateway!
+        |> extract_gateway!
+        |> set_config!
 
       {:ok, config}
-    catch
-      reason -> {:error, reason}
+    rescue reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
-  def login(
-    %Homerico.Connect.Config{} = config,
-    user,
-    password
-  ) when
-    is_binary(user) and
-    is_binary(password)
-  do
+  defp set_params!({user, password}), do: [
+    user: user,
+    password: password,
+    date: Homerico.date_format!
+  ]
+
+  defp set_request!(params), do:
+    :homerico
+      |> Application.app_dir("priv/connect/login.heex")
+      |> EEx.eval_file(params)
+      |> String.replace(~r/\s/, "")
+
+  defp get_token!(html, config), do:
+    config |> Homerico.Client.post16!("login.asp?", html)
+
+  defp extract_token!(%{"menu" => menus, "autenticacao" => token, "status" => sts})
+    when is_binary(menus) and is_binary(token) and (sts == "1"), do:
+      %{token: token, menus: String.split(menus, ",")}
+  defp extract_token!(_), do: throw "invalid response from server"
+
+  def login(%Homerico.Connect.Config{} = config, user, password)
+    when is_binary(user) and is_binary(password) do
     try do
-      Homerico.check_expire_date!
+      Homerico.check_expired!
 
-      # Params to Login HTML
-      eex_params = [
-        user: user,
-        password: password,
-        date: Homerico.date_format!
-      ]
+      # Get Login Token
+      nconfig = {user, password}
+        |> set_params!
+        |> set_request!
+        |> get_token!(config)
+        |> extract_token!
+        |> set_config!(config)
 
-      # Format HTML
-      html = :homerico
-        |> Application.app_dir("priv/connect/login.heex")
-        |> EEx.eval_file(eex_params)
-        |> String.replace(~r/\s/, "")
-
-      # Do Request
-      data = config |> Homerico.Client.post16!("login.asp?", html)
-
-      # Check Response
-      unless Map.has_key?(data, "status") and is_binary(data["status"]) do
-        throw "response key 'status' not valid"
-      end
-      unless data["status"] === "1" do
-        throw "not accepted by the server"
-      end
-      unless Map.has_key?(data, "autenticacao") and is_binary(data["autenticacao"]) do
-        throw "response key 'autenticacao' not valid"
-      end
-      unless Map.has_key?(data, "menu") and is_binary(data["menu"]) do
-        throw "response key 'menu' not valid"
-      end
-
-      # Set Parameters
-      upstr = Map.merge(config, %{
-        menus: String.split(data["menu"], ","),
-        token: data["autenticacao"]
-      })
-
-      {:ok, upstr}
-    catch
-      reason -> {:error, reason}
+      {:ok, nconfig}
+    rescue reason -> {:error, reason}
+    catch reason -> {:error, reason}
     end
   end
 
