@@ -52,11 +52,10 @@ defmodule Homerico.Connect do
     date: Homerico.date_format!
   ]
 
-  defp set_request!(params), do:
-    :homerico
-      |> Application.app_dir("priv/connect/login.heex")
-      |> EEx.eval_file(params)
-      |> String.replace(~r/\s/, "")
+  defp set_request!(params), do: :homerico
+    |> Application.app_dir("priv/connect/login.heex")
+    |> EEx.eval_file(params)
+    |> String.replace(~r/\s/, "")
 
   defp get_token!(html, config), do:
     config |> Homerico.Client.post16!("login.asp?", html)
