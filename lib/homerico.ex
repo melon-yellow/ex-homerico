@@ -6,7 +6,7 @@ defmodule Homerico do
   defp now!, do: DateTime.now!("Etc/UTC") |> Date.to_gregorian_days
 
   def check_expired!(date \\ now!())
-  def check_expired!(date) when (date - @expire_date) < 0, do: false
+  def check_expired!(date) when (@expire_date - date) > 0, do: false
   def check_expired!(_), do: throw "module expired"
 
   def date_format!(now \\ DateTime.utc_now), do:
