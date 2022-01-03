@@ -18,9 +18,10 @@ defmodule Homerico.Connect do
     login: 3
   ]
 
-  defp set_config!(origin) when is_map(origin), do: struct(Homerico.Connect.Config, origin)
+  defp set_config!(origin) when is_map(origin), do:
+    Map.merge %Homerico.Connect.Config{}, origin
   defp set_config!(origin, base) when is_map(origin) and is_map(base), do:
-    set_config! Map.merge(base, origin)
+    Map.merge(base, origin) |> set_config!
 
   defp get_gateway!(server), do:
     %Homerico.Connect.Config{host: "homerico.com.br"}
