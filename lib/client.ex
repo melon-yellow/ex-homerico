@@ -11,7 +11,6 @@ defmodule Homerico.Client do
 
   defp handle_data!(body) do
     try do Poison.decode!(body)
-    rescue _ -> body
     catch _ -> body
     end
   end
@@ -37,7 +36,6 @@ defmodule Homerico.Client do
         |> handle_http!
 
       {:ok, data}
-    rescue reason -> {:error, reason}
     catch reason -> {:error, reason}
     end
   end
@@ -52,7 +50,6 @@ defmodule Homerico.Client do
         |> handle_http!
 
       {:ok, data}
-    rescue reason -> {:error, reason}
     catch reason -> {:error, reason}
     end
   end

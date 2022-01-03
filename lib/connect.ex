@@ -28,13 +28,11 @@ defmodule Homerico.Connect do
 
   defp extract_gateway!(%{"ip" => host, "porta" => port})
     when is_binary(host) and is_binary(port), do:
-      [host: host, port: String.to_integer(port)]
+      %{host: host, port: String.to_integer(port)}
   defp extract_gateway!(_), do: throw "invalid response from server"
 
   def gateway(server) when is_binary(server) do
     try do
-      Homerico.check_expired!
-
       # Get Partial Config
       config = server
         |> get_gateway!
@@ -62,14 +60,12 @@ defmodule Homerico.Connect do
 
   defp extract_token!(%{"menu" => menus, "autenticacao" => token, "status" => sts})
     when is_binary(menus) and is_binary(token) and (sts == "1"), do:
-      [token: token, menus: String.split(menus, ",")]
+      %{token: token, menus: String.split(menus, ",")}
   defp extract_token!(_), do: throw "invalid response from server"
 
   def login(%Homerico.Connect.Config{} = config, user, password)
     when is_binary(user) and is_binary(password) do
     try do
-      Homerico.check_expired!
-
       # Get Login Token
       hydrated = {user, password}
         |> set_params!
