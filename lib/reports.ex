@@ -14,10 +14,11 @@ defmodule Homerico.Reports do
     relatorio_interrupcoes: 3
   ]
 
+  defp throw_menu!(valid) when valid, do: true
+  defp throw_menu!(_), do: throw "no access to menu"
+
   defp check_menu!(%Homerico.Connect.Config{} = config, menu)
-    when is_binary(menu) and (menu in config.menus), do: true
-  defp check_menu!(%Homerico.Connect.Config{} = config, menu)
-    when is_binary(menu), do: throw "no access to menu '#{menu}'"
+    when is_binary(menu), do: config.menus |> Enum.member?(menu) |> throw_menu!
 
   defp http_query!(%Homerico.Connect.Config{} = config, date \\ Homerico.date_format!)
     when is_binary(date), do: "autenticacao=#{config.token}&numencypt=#{date}"

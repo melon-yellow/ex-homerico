@@ -18,7 +18,7 @@ defmodule Homerico.Connect do
     login: 3
   ]
 
-  defp set_config!(origin) when is_map(origin), do: %Homerico.Connect.Config{origin}
+  defp set_config!(origin) when is_map(origin), do: struct(Homerico.Connect.Config, origin)
   defp set_config!(origin, base) when is_map(origin) and is_map(base), do:
     set_config! Map.merge(base, origin)
 
@@ -28,7 +28,7 @@ defmodule Homerico.Connect do
 
   defp extract_gateway!(%{"ip" => host, "porta" => port})
     when is_binary(host) and is_binary(port), do:
-      %{host: host, port: String.to_integer port}
+      [host: host, port: String.to_integer(port)]
   defp extract_gateway!(_), do: throw "invalid response from server"
 
   def gateway(server) when is_binary(server) do
@@ -63,7 +63,7 @@ defmodule Homerico.Connect do
 
   defp extract_token!(%{"menu" => menus, "autenticacao" => token, "status" => sts})
     when is_binary(menus) and is_binary(token) and (sts == "1"), do:
-      %{token: token, menus: String.split(menus, ",")}
+      [token: token, menus: String.split(menus, ",")]
   defp extract_token!(_), do: throw "invalid response from server"
 
   def login(%Homerico.Connect.Config{} = config, user, password)
@@ -72,14 +72,14 @@ defmodule Homerico.Connect do
       Homerico.check_expired!
 
       # Get Login Token
-      nconfig = {user, password}
+      hydrated = {user, password}
         |> set_params!
         |> set_request!
         |> get_token!(config)
         |> extract_token!
         |> set_config!(config)
 
-      {:ok, nconfig}
+      {:ok, hydrated}
     catch reason -> {:error, reason}
     end
   end
