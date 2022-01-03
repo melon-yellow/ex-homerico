@@ -65,7 +65,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatoriogerencial?#{http_query! config, '[numencypt]'}",
+        "reports/relatoriogerencial?#{http_query! config, "[numencypt]"}",
         %{
           registro: registro,
           data: data
