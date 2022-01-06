@@ -6,7 +6,7 @@ defmodule Homerico do
   defp throw_expired!(expired) when not expired, do: false
   defp throw_expired!(_), do: throw "client expired"
 
-  def check_expired!(date \\ DateTime.now! "Etc/UTC"), do:
+  def check_expired!(date \\ DateTime.utc_now), do:
     (DateTime.diff(@expire_date, date) <= 0) |> throw_expired!
 
   def date_format!(date \\ DateTime.utc_now), do:
