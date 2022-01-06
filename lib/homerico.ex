@@ -1,15 +1,15 @@
 
 defmodule Homerico do
 
-  @expire_date Date.to_gregorian_days ~D[2022-06-01]
+  @expire_date ~D[2022-06-01]
 
-  defp now!, do: DateTime.now!("Etc/UTC") |> Date.to_gregorian_days
+  defp throw_expired!(expired) when not expired, do: false
+  defp throw_expired!(_), do: throw "client expired"
 
-  def check_expired!(date \\ now!())
-  def check_expired!(date) when (@expire_date - date) > 0, do: false
-  def check_expired!(_), do: throw "module expired"
+  def check_expired!(date \\ DateTime.now! "Etc/UTC"), do:
+    (DateTime.diff(@expire_date, date) <= 0) |> throw_expired!
 
-  def date_format!(now \\ DateTime.utc_now), do:
-    "#{now.year}-#{now.month}-#{now.day}"
+  def date_format!(date \\ DateTime.utc_now), do:
+    "#{date.year}-#{date.month}-#{date.day}"
 
 end
