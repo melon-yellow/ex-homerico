@@ -58,7 +58,7 @@ defmodule Homerico.Connect do
     |> String.replace(~r/\s/, "")
 
   defp get_token!(html, config), do:
-    config |> Homerico.Client.post16!("login.asp?", html)
+    Homerico.Client.post16! config, "login.asp?", html
 
   defp extract_token!(%{"menu" => menus, "autenticacao" => token, "status" => sts})
     when is_binary(menus) and is_binary(token) and (sts == "1"), do:
@@ -69,14 +69,14 @@ defmodule Homerico.Connect do
     when is_binary(user) and is_binary(password) do
     try do
       # Get Login Token
-      hydrated = {user, password}
+      new_config = {user, password}
         |> set_params!
         |> set_request_html!
         |> get_token!(config)
         |> extract_token!
         |> set_config!(config)
 
-      {:ok, hydrated}
+      {:ok, new_config}
     rescue reason -> {:error, reason}
     catch reason -> {:error, reason}
     end

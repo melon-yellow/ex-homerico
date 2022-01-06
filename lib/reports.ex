@@ -14,7 +14,7 @@ defmodule Homerico.Reports do
     relatorio_interrupcoes: 3
   ]
 
-  defp throw_menu!(valid) when valid, do: true
+  defp throw_menu!(member) when member, do: true
   defp throw_menu!(_), do: throw "no access to menu"
 
   defp check_menu!(%Homerico.Connect.Config{} = config, menu)
@@ -38,7 +38,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatoriolistas?#{http_query! config}",
+        "reports/relatoriolistas?" <> http_query!(config),
         %{
           reportselect: "relatoriolistas",
           idprocesso: id_processo,
@@ -66,7 +66,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatoriogerencial?#{http_query! config, "[numencypt]"}",
+        "reports/relatoriogerencial?" <> http_query!(config, "[numencypt]"),
         %{
           registro: registro,
           data: data
@@ -92,7 +92,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatoriogerencial?#{http_query! config}",
+        "reports/relatoriogerencial?" <> http_query!(config),
         %{
           idreport: id_report,
           data: data
@@ -120,7 +120,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/relatorioboletim?#{http_query! config}",
+        "reports/relatorioboletim?" <> http_query!(config),
         %{
           reportselect: "relatorioboletim",
           idreport: id_report,
@@ -148,7 +148,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/producaolistas?#{http_query! config}",
+        "reports/producaolistas?" <> http_query!(config),
         %{
           controle: controle,
           data: data_final
@@ -174,7 +174,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/ov?#{http_query! config}",
+        "reports/ov?" <> http_query!(config),
         %{
           idprocessogrupo: id_processo_grupo,
           data: data
@@ -200,7 +200,7 @@ defmodule Homerico.Reports do
 
       # Do Request
       data = config |> Homerico.Client.post16!(
-        "reports/interrupcoes?#{http_query! config}",
+        "reports/interrupcoes?" <> http_query!(config),
         %{
           idprocesso: id_processo,
           data: data,
