@@ -48,8 +48,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
@@ -74,8 +73,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
@@ -100,8 +98,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
@@ -130,8 +127,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
@@ -156,8 +152,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
@@ -182,8 +177,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
@@ -208,8 +202,7 @@ defmodule Homerico.Reports do
       )
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 

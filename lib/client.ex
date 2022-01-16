@@ -11,8 +11,7 @@ defmodule Homerico.Client do
 
   defp handle_data!(body) do
     try do Poison.decode!(body)
-    rescue _ -> body
-    catch _ -> body
+    catch _, _ -> body
     end
   end
 
@@ -28,7 +27,7 @@ defmodule Homerico.Client do
       post16 config, url, Poison.encode!(stream)
 
   def post16(%Homerico.Connect.Config{} = config, url, stream)
-    when is_binary(url) and is_binary(stream) do
+  when is_binary(url) and is_binary(stream) do
     try do
       Homerico.check_expired!
 
@@ -37,13 +36,12 @@ defmodule Homerico.Client do
         |> handle_http!
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
   def get(%Homerico.Connect.Config{} = config, url)
-    when is_binary(url) do
+  when is_binary(url) do
     try do
       Homerico.check_expired!
 
@@ -52,8 +50,7 @@ defmodule Homerico.Client do
         |> handle_http!
 
       {:ok, data}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 

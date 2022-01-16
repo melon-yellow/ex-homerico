@@ -41,8 +41,7 @@ defmodule Homerico.Connect do
         |> set_config!
 
       {:ok, config}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
@@ -77,8 +76,7 @@ defmodule Homerico.Connect do
         |> set_config!(config)
 
       {:ok, new_config}
-    rescue reason -> {:error, reason}
-    catch reason -> {:error, reason}
+    catch _, reason -> {:error, reason}
     end
   end
 
