@@ -1,8 +1,7 @@
 import Unsafe.Handler
 
 defmodule Homerico.Reports do
-  use Unsafe.Generator,
-    handler: :bang!
+  use Unsafe.Generator, handler: :bang!
 
   @unsafe [
     relatorio_lista: 4,
@@ -14,17 +13,23 @@ defmodule Homerico.Reports do
     relatorio_interrupcoes: 3
   ]
 
+  defp throw_conn!(%{__struct__: Homerico.Client.Connection} = conn), do: conn
+  defp throw_conn!(_conn), do: throw "invalid client/connection"
+
+  defp get_conn!(pid), do:
+    pid |> Agent.get(& &1) |> throw_conn!
+
   defp throw_menu!(member) when member, do: true
   defp throw_menu!(_), do: throw "no access to menu"
 
-  defp check_menu!(%Homerico.Connect.Config{} = config, menu)
-    when is_binary(menu), do: config.menus |> Enum.member?(menu) |> throw_menu!
+  defp check_menu!(%Homerico.Client.Connection{} = conn, menu)
+    when is_binary(menu), do: conn.menus |> Enum.member?(menu) |> throw_menu!
 
-  defp http_query!(%Homerico.Connect.Config{} = config, date \\ Homerico.date_format!)
-    when is_binary(date), do: "autenticacao=#{config.token}&numencypt=#{date}"
+  defp http_query!(%Homerico.Client.Connection{} = conn, date \\ Homerico.date_format!)
+    when is_binary(date), do: "autenticacao=#{conn.token}&numencypt=#{date}"
 
   def relatorio_lista(
-    %Homerico.Connect.Config{} = config,
+    pid,
     id_processo,
     data_inicial,
     data_final
@@ -34,11 +39,12 @@ defmodule Homerico.Reports do
     is_binary(data_final)
   do
     try do
-      check_menu! config, "d1"
+      conn = get_conn! pid
+      check_menu! conn, "d1"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(
-        "reports/relatoriolistas?" <> http_query!(config),
+      data = conn |> Homerico.Client.post16!(
+        "reports/relatoriolistas?" <> http_query!(conn),
         %{
           reportselect: "relatoriolistas",
           idprocesso: id_processo,
@@ -53,7 +59,7 @@ defmodule Homerico.Reports do
   end
 
   def relatorio_gerencial_registro(
-    %Homerico.Connect.Config{} = config,
+    pid,
     registro,
     data
   ) when
@@ -61,11 +67,12 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      check_menu! config, "d3"
+      conn = get_conn! pid
+      check_menu! conn, "d3"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(
-        "reports/relatoriogerencial?" <> http_query!(config, "[numencypt]"),
+      data = conn |> Homerico.Client.post16!(
+        "reports/relatoriogerencial?" <> http_query!(conn, "[numencypt]"),
         %{
           registro: registro,
           data: data
@@ -78,7 +85,7 @@ defmodule Homerico.Reports do
   end
 
   def relatorio_gerencial_report(
-    %Homerico.Connect.Config{} = config,
+    pid,
     id_report,
     data
   ) when
@@ -86,11 +93,12 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      check_menu! config, "d3"
+      conn = get_conn! pid
+      check_menu! conn, "d3"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(
-        "reports/relatoriogerencial?" <> http_query!(config),
+      data = conn |> Homerico.Client.post16!(
+        "reports/relatoriogerencial?" <> http_query!(conn),
         %{
           idreport: id_report,
           data: data
@@ -103,7 +111,7 @@ defmodule Homerico.Reports do
   end
 
   def relatorio_boletim(
-    %Homerico.Connect.Config{} = config,
+    pid,
     id_report,
     data_inicial,
     data_final
@@ -113,11 +121,12 @@ defmodule Homerico.Reports do
     is_binary(data_final)
   do
     try do
-      check_menu! config, "d1"
+      conn = get_conn! pid
+      check_menu! conn, "d1"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(
-        "reports/relatorioboletim?" <> http_query!(config),
+      data = conn |> Homerico.Client.post16!(
+        "reports/relatorioboletim?" <> http_query!(conn),
         %{
           reportselect: "relatorioboletim",
           idreport: id_report,
@@ -132,7 +141,7 @@ defmodule Homerico.Reports do
   end
 
   def producao_lista(
-    %Homerico.Connect.Config{} = config,
+    pid,
     controle,
     data_final
   ) when
@@ -140,11 +149,12 @@ defmodule Homerico.Reports do
     is_binary(data_final)
   do
     try do
-      check_menu! config, "pro09"
+      conn = get_conn! pid
+      check_menu! conn, "pro09"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(
-        "reports/producaolistas?" <> http_query!(config),
+      data = conn |> Homerico.Client.post16!(
+        "reports/producaolistas?" <> http_query!(conn),
         %{
           controle: controle,
           data: data_final
@@ -157,7 +167,7 @@ defmodule Homerico.Reports do
   end
 
   def relatorio_ov(
-    %Homerico.Connect.Config{} = config,
+    pid,
     id_processo_grupo,
     data
   ) when
@@ -165,11 +175,12 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      check_menu! config, "pro4"
+      conn = get_conn! pid
+      check_menu! conn, "pro4"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(
-        "reports/ov?" <> http_query!(config),
+      data = conn |> Homerico.Client.post16!(
+        "reports/ov?" <> http_query!(conn),
         %{
           idprocessogrupo: id_processo_grupo,
           data: data
@@ -182,7 +193,7 @@ defmodule Homerico.Reports do
   end
 
   def relatorio_interrupcoes(
-    %Homerico.Connect.Config{} = config,
+    pid,
     id_processo,
     data
   ) when
@@ -190,11 +201,12 @@ defmodule Homerico.Reports do
     is_binary(data)
   do
     try do
-      check_menu! config, "pro2"
+      conn = get_conn! pid
+      check_menu! conn, "pro2"
 
       # Do Request
-      data = config |> Homerico.Client.post16!(
-        "reports/interrupcoes?" <> http_query!(config),
+      data = conn |> Homerico.Client.post16!(
+        "reports/interrupcoes?" <> http_query!(conn),
         %{
           idprocesso: id_processo,
           data: data,
