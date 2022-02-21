@@ -1,4 +1,3 @@
-import Unsafe.Handler
 
 ##########################################################################################################################
 
@@ -14,7 +13,7 @@ end
 ##########################################################################################################################
 
 defmodule Homerico.Client.Connect do
-  use Unsafe.Generator, handler: :bang!
+  use Unsafe.Generator, handler: {Unsafe.Handler, :bang!}
   alias Homerico.Client.Network
 
   @unsafe [gateway: 1, login: 3]
