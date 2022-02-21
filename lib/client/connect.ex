@@ -15,16 +15,17 @@ end
 defmodule Homerico.Client.Connect do
   use Unsafe.Generator, handler: {Unsafe.Handler, :bang!}
   alias Homerico.Client.Network
+  alias Homerico.Client.Connection
 
   @unsafe [gateway: 1, login: 3]
 
   defp set_conn!(origin) when is_map(origin), do:
-    Map.merge %Homerico.Client.Connection{}, origin
+    Map.merge %Connection{}, origin
   defp set_conn!(origin, base) when is_map(origin) and is_map(base), do:
     Map.merge(base, origin) |> set_conn!
 
   defp get_gateway!(server), do:
-    %Homerico.Client.Connection{host: "homerico.com.br"}
+    %Connection{host: "homerico.com.br"}
       |> Network.get!("linkautenticacao.asp?empresa=#{server}")
 
   defp extract_gateway!(%{"ip" => host, "porta" => port})
@@ -64,7 +65,7 @@ defmodule Homerico.Client.Connect do
       %{token: token, menus: String.split(menus, ",")}
   defp extract_token!(_), do: throw "invalid response from server"
 
-  def login(%Homerico.Client.Connection{} = conn, user, password)
+  def login(%Connection{} = conn, user, password)
     when is_binary(user) and is_binary(password) do
     try do
       # Get Login Token
