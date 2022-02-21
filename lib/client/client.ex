@@ -2,10 +2,7 @@
 ##########################################################################################################################
 
 defmodule Homerico.Client.Config do
-  defmodule Login do
-    defstruct [user: "", password: ""]
-  end
-  
+  defmodule Login, do: defstruct [user: "", password: ""]
   defstruct [gateway: "", login: %Login{}]
 end
 
