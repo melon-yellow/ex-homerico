@@ -4,7 +4,7 @@
 defmodule Homerico.Client do
 
   def start_link(
-    [gateway: gateway, login: [user: user, password: password]] = _config,
+    %{gateway: gateway, login: %{user: user, password: password}} = _config,
     init_arg
   ) when
     is_binary(gateway) and
@@ -44,12 +44,15 @@ defmodule Homerico.Client do
       use Agent
 
       def start_link(init_arg) when is_list(init_arg) do
-        config = case Homerico.Client.callback(__MODULE__, :configuration, []) do
-          :not_implemented -> Keyword.fetch!(init_arg, :config)
-          {:error, reason} -> throw reason
-          {:ok, data} -> data
+        try do
+          config = case Homerico.Client.callback(__MODULE__, :configuration, []) do
+            :not_implemented -> Keyword.fetch!(init_arg, :config)
+            {:error, reason} -> throw reason
+            {:ok, data} -> data
+          end
+          Homerico.Client.start_link config, init_arg
+        catch _, reason -> {:error, reason}
         end
-        Homerico.Client.start_link config, init_arg
       end
 
     end
