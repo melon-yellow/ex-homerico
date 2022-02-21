@@ -2,6 +2,7 @@ import Unsafe.Handler
 
 defmodule Homerico.Reports do
   use Unsafe.Generator, handler: :bang!
+  alias Homerico.Client.Network
 
   @unsafe [
     relatorio_lista: 4,
@@ -43,7 +44,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d1"
 
       # Do Request
-      data = conn |> Homerico.Client.post16!(
+      data = conn |> Network.post16!(
         "reports/relatoriolistas?" <> http_query!(conn),
         %{
           reportselect: "relatoriolistas",
@@ -71,7 +72,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d3"
 
       # Do Request
-      data = conn |> Homerico.Client.post16!(
+      data = conn |> Network.post16!(
         "reports/relatoriogerencial?" <> http_query!(conn, "[numencypt]"),
         %{
           registro: registro,
@@ -97,7 +98,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d3"
 
       # Do Request
-      data = conn |> Homerico.Client.post16!(
+      data = conn |> Network.post16!(
         "reports/relatoriogerencial?" <> http_query!(conn),
         %{
           idreport: id_report,
@@ -125,7 +126,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d1"
 
       # Do Request
-      data = conn |> Homerico.Client.post16!(
+      data = conn |> Network.post16!(
         "reports/relatorioboletim?" <> http_query!(conn),
         %{
           reportselect: "relatorioboletim",
@@ -153,7 +154,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "pro09"
 
       # Do Request
-      data = conn |> Homerico.Client.post16!(
+      data = conn |> Network.post16!(
         "reports/producaolistas?" <> http_query!(conn),
         %{
           controle: controle,
@@ -179,7 +180,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "pro4"
 
       # Do Request
-      data = conn |> Homerico.Client.post16!(
+      data = conn |> Network.post16!(
         "reports/ov?" <> http_query!(conn),
         %{
           idprocessogrupo: id_processo_grupo,
@@ -205,7 +206,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "pro2"
 
       # Do Request
-      data = conn |> Homerico.Client.post16!(
+      data = conn |> Network.post16!(
         "reports/interrupcoes?" <> http_query!(conn),
         %{
           idprocesso: id_processo,
