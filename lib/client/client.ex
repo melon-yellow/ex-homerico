@@ -37,7 +37,7 @@ defmodule Homerico.Client do
 
   defmacro __using__(opts) when is_list(opts) do
     quote location: :keep, bind_quoted: [opts: opts] do
-      use Agent, opts
+      use Agent, Keyword.drop(opts, [:configuration])
 
       @behaviour Homerico.Client
       @mix_env Mix.env()
@@ -47,7 +47,7 @@ defmodule Homerico.Client do
       def start_link(init_arg) when is_list(init_arg) do
         try do
           config = case Callback.apply(__MODULE__, :configuration, []) do
-            :not_implemented -> Keyword.fetch!(init_arg, :config)
+            :not_implemented -> Keyword.fetch!(opts, :configuration)
             {:error, reason} -> throw reason
             {:ok, data} -> data
           end
