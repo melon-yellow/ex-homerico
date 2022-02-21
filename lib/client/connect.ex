@@ -15,6 +15,7 @@ end
 
 defmodule Homerico.Client.Connect do
   use Unsafe.Generator, handler: :bang!
+  alias Homerico.Client.Network
 
   @unsafe [gateway: 1, login: 3]
 
@@ -25,7 +26,7 @@ defmodule Homerico.Client.Connect do
 
   defp get_gateway!(server), do:
     %Homerico.Client.Connection{host: "homerico.com.br"}
-      |> Homerico.Client.get!("linkautenticacao.asp?empresa=#{server}")
+      |> Network.get!("linkautenticacao.asp?empresa=#{server}")
 
   defp extract_gateway!(%{"ip" => host, "porta" => port})
     when is_binary(host) and is_binary(port), do:
@@ -57,7 +58,7 @@ defmodule Homerico.Client.Connect do
     |> String.replace(~r/\s/, "")
 
   defp get_token!(html, conn), do:
-    Homerico.Client.post16! conn, "login.asp?", html
+    Network.post16! conn, "login.asp?", html
 
   defp extract_token!(%{"menu" => menus, "autenticacao" => token, "status" => sts})
     when is_binary(menus) and is_binary(token) and (sts == "1"), do:
