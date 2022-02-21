@@ -5,7 +5,8 @@ defmodule Homerico.Client do
   require Agent
   alias Homerico.Client.Callback
 
-  @optional_callback configuration() :: any
+  @callback configuration() :: any
+  @optional_callbacks [configurarion: 0]
 
   def start_link(
     %{gateway: gateway, login: %{user: user, password: password}} = _config,
