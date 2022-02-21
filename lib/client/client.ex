@@ -46,7 +46,7 @@ defmodule Homerico.Client do
 
       def start_link(init_arg) when is_list(init_arg) do
         try do
-          config = Callback.configuration(__MODULE__, opts)
+          config = Callback.configuration __MODULE__, opts
           Homerico.Client.start_link config, init_arg
         catch _, reason -> {:error, reason}
         end
@@ -70,9 +70,7 @@ defmodule Homerico.Client.Callback do
     end
   end
 
-  defp apply_callback(module, fun, args) when
-    is_atom(fun) and is_list(args)
-  do
+  defp apply_callback(module, fun, args) do
     module.__info__(:functions)
       |> Keyword.has_key?(fun)
       |> implement_callback({module, fun, args})
