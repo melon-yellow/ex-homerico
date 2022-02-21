@@ -36,7 +36,7 @@ defmodule Homerico.Client do
     {:error, "invalid configuration"}
 
   defmacro __using__(opts) when is_list(opts) do
-    quote do
+    quote location: :keep, bind_quoted: [opts: opts] do
       use Agent, opts
 
       @behaviour Homerico.Client
