@@ -14,7 +14,7 @@ defmodule Homerico.Reports do
     relatorio_interrupcoes: 3
   ]
 
-  defp throw_conn!(%{__struct__: Connection} = conn), do: conn
+  defp throw_conn!(%Connection{} = conn), do: conn
   defp throw_conn!(_conn), do: throw "invalid client/connection"
 
   defp get_conn!(pid), do:
