@@ -35,9 +35,9 @@ defmodule Homerico.Client do
   def start_link(_config, init_arg) when is_list(init_arg), do:
     {:error, "invalid configuration"}
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) when is_list(opts) do
     quote do
-      use Agent
+      use Agent opts
 
       @behaviour Homerico.Client
 
