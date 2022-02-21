@@ -1,7 +1,7 @@
-import Unsafe.Handler
 
 defmodule Homerico.Client.Network do
-  use Unsafe.Generator, handler: :bang!
+  use Unsafe.Generator, handler: {Unsafe.Handler, :bang!}
+  alias Homerico.Client.Connection
 
   @unsafe [get: 2, post16: 3]
 
@@ -15,14 +15,14 @@ defmodule Homerico.Client.Network do
   defp handle_http!({:ok, %{status_code: 404}}), do: throw "(404) could not reach the link"
   defp handle_http!({:error, %{reason: reason}}), do: throw reason
 
-  defp base_url!(%Homerico.Client.Connection{} = conn), do:
+  defp base_url!(%Connection{} = conn), do:
     "http://#{conn.host}:#{conn.port}/"
 
-  def post16(%Homerico.Client.Connection{} = conn, url, stream)
+  def post16(%Connection{} = conn, url, stream)
     when is_binary(url) and is_map(stream), do:
       post16 conn, url, Poison.encode!(stream)
 
-  def post16(%Homerico.Client.Connection{} = conn, url, stream)
+  def post16(%Connection{} = conn, url, stream)
   when is_binary(url) and is_binary(stream) do
     try do
       Homerico.check_expired!
@@ -36,7 +36,7 @@ defmodule Homerico.Client.Network do
     end
   end
 
-  def get(%Homerico.Client.Connection{} = conn, url)
+  def get(%Connection{} = conn, url)
   when is_binary(url) do
     try do
       Homerico.check_expired!
