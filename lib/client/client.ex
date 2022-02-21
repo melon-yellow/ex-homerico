@@ -37,7 +37,7 @@ defmodule Homerico.Client do
 
   defmacro __using__(opts) when is_list(opts) do
     quote do
-      use Agent opts
+      use Agent, opts
 
       @behaviour Homerico.Client
 
