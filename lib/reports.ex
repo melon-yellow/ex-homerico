@@ -1,8 +1,8 @@
-import Unsafe.Handler
 
 defmodule Homerico.Reports do
-  use Unsafe.Generator, handler: :bang!
+  use Unsafe.Generator, handler: {Unsafe.Handler, :bang!}
   alias Homerico.Client.Network
+  alias Homerico.Client.Connection
 
   @unsafe [
     relatorio_lista: 4,
@@ -14,7 +14,7 @@ defmodule Homerico.Reports do
     relatorio_interrupcoes: 3
   ]
 
-  defp throw_conn!(%{__struct__: Homerico.Client.Connection} = conn), do: conn
+  defp throw_conn!(%{__struct__: Connection} = conn), do: conn
   defp throw_conn!(_conn), do: throw "invalid client/connection"
 
   defp get_conn!(pid), do:
@@ -23,10 +23,10 @@ defmodule Homerico.Reports do
   defp throw_menu!(member) when member, do: true
   defp throw_menu!(_), do: throw "no access to menu"
 
-  defp check_menu!(%Homerico.Client.Connection{} = conn, menu)
+  defp check_menu!(%Connection{} = conn, menu)
     when is_binary(menu), do: conn.menus |> Enum.member?(menu) |> throw_menu!
 
-  defp http_query!(%Homerico.Client.Connection{} = conn, date \\ Homerico.date_format!)
+  defp http_query!(%Connection{} = conn, date \\ Homerico.date_format!)
     when is_binary(date), do: "autenticacao=#{conn.token}&numencypt=#{date}"
 
   def relatorio_lista(
