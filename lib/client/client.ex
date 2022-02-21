@@ -55,8 +55,8 @@ end
 
 defmodule Homerico.Client.Callback do
 
-  defp optional(false, _), do: :not_implemented
-  defp optional(true, {module, fun, args}) do
+  defp implement(false, _), do: :not_implemented
+  defp implement(true, {module, fun, args}) do
     try do
       data = apply module, fun, args
       {:ok, data}
@@ -69,7 +69,7 @@ defmodule Homerico.Client.Callback do
   do:
     module.__info__(:functions)
       |> Keyword.has_key?(fun)
-      |> optional({module, fun, args})
+      |> implement({module, fun, args})
 
 end
 
