@@ -38,7 +38,10 @@ defmodule Homerico.Client do
   defmacro __using__(opts) when is_list(opts) do
     quote location: :keep, bind_quoted: [opts: opts] do
       use Agent, opts
+
       @behaviour Homerico.Client
+      @mix_env Mix.env()
+
       alias __MODULE__
 
       def start_link(init_arg) when is_list(init_arg) do
