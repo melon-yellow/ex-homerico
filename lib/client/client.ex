@@ -31,7 +31,7 @@ defmodule Homerico.Client do
   defmacro __using__(opts) when is_list(opts) do
     quote location: :keep, bind_quoted: [opts: opts] do
       use Agent, Keyword.drop(opts, [:configuration])
-      @opts unquote opts
+      @opts opts
 
       @behaviour Homerico.Client
       @mix_env Mix.env
