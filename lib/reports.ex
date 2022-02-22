@@ -1,8 +1,10 @@
 
+##########################################################################################################################
+
 defmodule Homerico.Reports do
   use Unsafe.Generator, handler: {Unsafe.Handler, :bang!}
-  alias Homerico.Client.Network
   alias Homerico.Client.Connection
+  alias Homerico.Client.HTTP
 
   @unsafe [
     relatorio_lista: 4,
@@ -29,6 +31,8 @@ defmodule Homerico.Reports do
   defp http_query!(%Connection{} = conn, date \\ Homerico.date_format!)
     when is_binary(date), do: "autenticacao=#{conn.token}&numencypt=#{date}"
 
+##########################################################################################################################
+
   def relatorio_lista(
     pid,
     id_processo,
@@ -44,7 +48,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d1"
 
       # Do Request
-      data = conn |> Network.post16!(
+      data = conn |> HTTP.post16!(
         "reports/relatoriolistas?" <> http_query!(conn),
         %{
           reportselect: "relatoriolistas",
@@ -59,6 +63,8 @@ defmodule Homerico.Reports do
     end
   end
 
+##########################################################################################################################
+
   def relatorio_gerencial_registro(
     pid,
     registro,
@@ -72,7 +78,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d3"
 
       # Do Request
-      data = conn |> Network.post16!(
+      data = conn |> HTTP.post16!(
         "reports/relatoriogerencial?" <> http_query!(conn, "[numencypt]"),
         %{
           registro: registro,
@@ -84,6 +90,8 @@ defmodule Homerico.Reports do
     catch _, reason -> {:error, reason}
     end
   end
+
+##########################################################################################################################
 
   def relatorio_gerencial_report(
     pid,
@@ -98,7 +106,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d3"
 
       # Do Request
-      data = conn |> Network.post16!(
+      data = conn |> HTTP.post16!(
         "reports/relatoriogerencial?" <> http_query!(conn),
         %{
           idreport: id_report,
@@ -110,6 +118,8 @@ defmodule Homerico.Reports do
     catch _, reason -> {:error, reason}
     end
   end
+
+##########################################################################################################################
 
   def relatorio_boletim(
     pid,
@@ -126,7 +136,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "d1"
 
       # Do Request
-      data = conn |> Network.post16!(
+      data = conn |> HTTP.post16!(
         "reports/relatorioboletim?" <> http_query!(conn),
         %{
           reportselect: "relatorioboletim",
@@ -141,6 +151,8 @@ defmodule Homerico.Reports do
     end
   end
 
+##########################################################################################################################
+
   def producao_lista(
     pid,
     controle,
@@ -154,7 +166,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "pro09"
 
       # Do Request
-      data = conn |> Network.post16!(
+      data = conn |> HTTP.post16!(
         "reports/producaolistas?" <> http_query!(conn),
         %{
           controle: controle,
@@ -166,6 +178,8 @@ defmodule Homerico.Reports do
     catch _, reason -> {:error, reason}
     end
   end
+
+##########################################################################################################################
 
   def relatorio_ov(
     pid,
@@ -180,7 +194,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "pro4"
 
       # Do Request
-      data = conn |> Network.post16!(
+      data = conn |> HTTP.post16!(
         "reports/ov?" <> http_query!(conn),
         %{
           idprocessogrupo: id_processo_grupo,
@@ -192,6 +206,8 @@ defmodule Homerico.Reports do
     catch _, reason -> {:error, reason}
     end
   end
+
+##########################################################################################################################
 
   def relatorio_interrupcoes(
     pid,
@@ -206,7 +222,7 @@ defmodule Homerico.Reports do
       check_menu! conn, "pro2"
 
       # Do Request
-      data = conn |> Network.post16!(
+      data = conn |> HTTP.post16!(
         "reports/interrupcoes?" <> http_query!(conn),
         %{
           idprocesso: id_processo,
@@ -220,3 +236,5 @@ defmodule Homerico.Reports do
   end
 
 end
+
+##########################################################################################################################

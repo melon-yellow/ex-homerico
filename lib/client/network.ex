@@ -1,22 +1,18 @@
 
-defmodule Homerico.Client.Network do
+##########################################################################################################################
+
+defmodule Homerico.Client.HTTP do
   use Unsafe.Generator, handler: {Unsafe.Handler, :bang!}
   alias Homerico.Client.Connection
 
   @unsafe [get: 2, post16: 3]
 
-  defp handle_data!(body) do
-    try do Poison.decode!(body)
-    catch _, _ -> body
-    end
-  end
-
-  defp handle_http!({:ok, %{status_code: 200, body: body}}), do: handle_data!(body)
-  defp handle_http!({:ok, %{status_code: 404}}), do: throw "(404) could not reach the link"
-  defp handle_http!({:error, %{reason: reason}}), do: throw reason
-
   defp base_url!(%Connection{} = conn), do:
     "http://#{conn.host}:#{conn.port}/"
+
+  defp handle_http!({:ok, %{status_code: 200, body: body}}), do: body
+  defp handle_http!({:ok, %{status_code: status}}), do: throw "http status: #{status}"
+  defp handle_http!({:error, %{reason: reason}}), do: throw reason
 
   def post16(%Connection{} = conn, url, stream)
     when is_binary(url) and is_map(stream), do:
@@ -51,3 +47,5 @@ defmodule Homerico.Client.Network do
   end
 
 end
+
+##########################################################################################################################

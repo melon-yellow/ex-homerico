@@ -14,8 +14,8 @@ end
 
 defmodule Homerico.Client.Connect do
   use Unsafe.Generator, handler: {Unsafe.Handler, :bang!}
-  alias Homerico.Client.Network
   alias Homerico.Client.Connection
+  alias Homerico.Client.HTTP
 
   @unsafe [gateway: 1, login: 3]
 
@@ -24,9 +24,9 @@ defmodule Homerico.Client.Connect do
   defp set_conn!(origin, base) when is_map(origin) and is_map(base), do:
     Map.merge(base, origin) |> set_conn!
 
-  defp get_gateway!(server), do:
-    %Connection{host: "homerico.com.br"}
-      |> Network.get!("linkautenticacao.asp?empresa=#{server}")
+  defp get_gateway!(server), do: %Connection{host: "homerico.com.br"}
+    |> HTTP.get!("linkautenticacao.asp?empresa=#{server}")
+    |> Poison.decode!
 
   defp extract_gateway!(%{"ip" => host, "porta" => port})
     when is_binary(host) and is_binary(port), do:
@@ -57,8 +57,9 @@ defmodule Homerico.Client.Connect do
     |> EEx.eval_file(params)
     |> String.replace(~r/\s/, "")
 
-  defp get_token!(html, conn), do:
-    Network.post16! conn, "login.asp?", html
+  defp get_token!(html, conn), do: conn
+    |> HTTP.post16!("login.asp?", html)
+    |> Poison.decode!
 
   defp extract_token!(%{"menu" => menus, "autenticacao" => token, "status" => sts})
     when is_binary(menus) and is_binary(token) and (sts == "1"), do:
