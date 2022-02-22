@@ -1,13 +1,6 @@
 
 ##########################################################################################################################
 
-defmodule Homerico.Client.Config do
-  defmodule Login, do: defstruct [user: "", password: ""]
-  defstruct [gateway: "", login: %Login{}]
-end
-
-##########################################################################################################################
-
 defmodule Homerico.Client do
   require Agent
   alias Homerico.Client.Callback
